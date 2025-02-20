@@ -1,25 +1,27 @@
+// src/services/userService.tsx
 import axios from "axios";
 
-const API_URL = "http://localhost:4500/api"; // Địa chỉ API của bạn
+const API_URL = "http://localhost:0911/api"; // Địa chỉ API của bạn
 
-export const register = async (data: {
+const callApi = async (endpoint: string, data: object) => {
+  try {
+    const response = await axios.post(`${API_URL}${endpoint}`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const register = (data: {
   username: string;
   password: string;
   email: string;
-}) => {
-  try {
-    const response = await axios.post(`${API_URL}/auth/register`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+}) => callApi("/auth/register", data);
 
-export const login = async (data: { email: string; password: string }) => {
-  try {
-    const response = await axios.post(`${API_URL}/auth/login`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+export const login = (data: {
+  phone: string;
+  password: string;
+  role: string;
+}) => callApi("/auth/login", data);
+
+export const logout = (data: {}) => callApi("/auth/logout", data);

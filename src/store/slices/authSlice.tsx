@@ -1,49 +1,53 @@
-// store/slices/authSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { register, login } from "../../services/userService";
-
-interface AuthState {
-  user: { id: string; username: string; email: string } | null;
-  token: string | null;
-  loading: boolean;
-  error: string | null;
-}
+import { AuthState } from "../../models/user";
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   loading: false,
   error: null,
 };
 
-// Thunk để xử lý đăng ký
-export const registerUser = createAsyncThunk(
-  "auth/register",
-  async (
-    data: { username: string; email: string; password: string },
-    { rejectWithValue }
-  ) => {
+// Thunk dùng chung để tạo request
+const createAsyncAction = (
+  type: string,
+  serviceFn: (data: any) => Promise<any>
+) =>
+  createAsyncThunk(type, async (data: any, { rejectWithValue }) => {
     try {
-      const response = await register(data);
-      return response; // Trả về dữ liệu từ API
+      const response = await serviceFn(data);
+      return response.data; // Trả về dữ liệu từ API
     } catch (error: any) {
-      return rejectWithValue(error.message || "Đăng ký thất bại");
+      return rejectWithValue(error.message || "Có lỗi xảy ra");
     }
-  }
-);
+  });
 
-// Thunk để xử lý đăng nhập
-export const loginUser = createAsyncThunk(
-  "auth/login",
-  async (data: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const response = await login(data);
-      return response; // Trả về dữ liệu từ API
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Đăng nhập thất bại");
-    }
-  }
-);
+export const registerUser = createAsyncAction("auth/register", register);
+export const loginUser = createAsyncAction("auth/login", login);
+
+// Hàm tiện ích để xử lý trạng thái chung
+const handleAsyncStates = (builder: any, action: any) => {
+  builder
+    .addCase(action.pending, (state: AuthState) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(action.fulfilled, (state: AuthState, action: any) => {
+      state.loading = false;
+      state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
+
+      console.log(action.payload.token);
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
+    })
+    .addCase(action.rejected, (state: AuthState, action: any) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+};
 
 const authSlice = createSlice({
   name: "auth",
@@ -51,42 +55,14 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.user = null;
-      state.token = null;
-      localStorage.removeItem("authToken");
+      state.accessToken = null;
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     },
   },
   extraReducers: (builder) => {
-    builder
-      // Xử lý trạng thái đăng ký
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        localStorage.setItem("authToken", action.payload.token);
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      // Xử lý trạng thái đăng nhập
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        localStorage.setItem("authToken", action.payload.token);
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+    handleAsyncStates(builder, registerUser);
+    handleAsyncStates(builder, loginUser);
   },
 });
 
