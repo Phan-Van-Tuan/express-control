@@ -22,5 +22,8 @@
     },
     "include": [
         "src"
+    ],
+    "files": [
+        "react-app-env.d.ts"
     ]
 }
