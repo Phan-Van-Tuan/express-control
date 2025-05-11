@@ -1,13 +1,14 @@
 export interface IUser {
   _id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email?: string;
   phone: string;
   rating: number | null;
   cancelPercent: number | null;
   aesKey?: string;
   avatar: string | null;
-  role: IRole;
+  role: "user" | "driver" | "admin" | "owner ";
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -24,5 +25,3 @@ export interface IResponseGetCountAccounts {
   driver: number;
   admin: number;
 }
-
-export type IRole = "user" | "driver" | "admin" | "owner ";

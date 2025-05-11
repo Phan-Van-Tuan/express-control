@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Modal from "../components/base/Model";
-import useAuth from "../hooks/useAuth";
+import Modal from "../components/base/Modal";
+// import useAuth from "../hooks/useAuth";
 
 const Logout: React.FC = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  // const { signOut } = useAuth();
 
   const handleLogout = () => {
-    signOut();
+    // signOut();
     toast.success("Logout successful!");
     navigate("/login");
   };

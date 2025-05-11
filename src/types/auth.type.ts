@@ -1,13 +1,12 @@
 import { IUser } from "./account.types";
 
-export interface ILogin {
-  phone: string;
+export type ILoginRequest = {
+  email: string;
   password: string;
-  role: string;
-}
+};
 
-export interface IResponseLogin {
+export type ILoginResponse = {
   user: IUser;
   accessToken: string;
   refreshToken: string;
-}
+};

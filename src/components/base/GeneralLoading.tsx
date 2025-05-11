@@ -1,5 +1,4 @@
-import { Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Props = {
   isLoading: boolean;
@@ -7,12 +6,16 @@ type Props = {
 
 export default function GeneralLoading({ isLoading }: Props) {
   return (
-    <>
+    <AnimatePresence>
       {isLoading && (
-        <div className="fixed z-10 h-full w-full bg-black bg-opacity-10 flex justify-center items-center">
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-        </div>
+        <motion.div
+          className="fixed top-0 left-0 h-1 bg-blue-500 z-[9999]"
+          initial={{ width: 0 }}
+          animate={{ width: "100%" }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
+        />
       )}
-    </>
+    </AnimatePresence>
   );
 }

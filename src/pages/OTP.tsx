@@ -4,7 +4,7 @@ import {
   RecaptchaVerifier,
   ConfirmationResult,
 } from "firebase/auth";
-import { auth } from "../utils/firebase";
+import { auth } from "../contants/firebase";
 
 function OTP() {
   const [phoneNumber, setPhoneNumber] = useState("");
